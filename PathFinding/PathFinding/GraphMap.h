@@ -1,7 +1,7 @@
 #pragma once
 #include "Edge.h"
 
-#define MAX_EDGES	4
+#define MAX_EDGES	8
 
 class GraphMap
 {

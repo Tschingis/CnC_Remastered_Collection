@@ -12,7 +12,7 @@ public:
 	BFS(const GraphMap* graph);
 	~BFS();
 
-	const int* getNodeDist() const { return mNodeDist; }
+	inline const int* getNodeDist() const { return mNodeDist; }
 	void run(int startNodeId);
 
 	

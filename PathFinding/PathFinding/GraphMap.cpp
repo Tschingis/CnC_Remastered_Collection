@@ -14,14 +14,19 @@ int GraphMap::getEdges(Edge edges[MAX_EDGES], int nodeId) const
 	int x = nodeId % mWidth;
 	int y = nodeId / mHeight;
 
-	int nb[4];
+	const int nbCount = 8;
+	int nb[nbCount];
 	nb[0] = x > 0 ? nodeId - 1 : -1;	// leftId
 	nb[1] = x < (mWidth - 1) ? nodeId + 1 : -1; // rightId
 	nb[2] = y > 0 ? nodeId - mHeight : -1; // topId
 	nb[3] = y < (mHeight - 1) ? nodeId + mHeight : -1; // bottomId
+	nb[4] = (nb[2] >= 0 && nb[0] >= 0) ? nodeId - mHeight - 1 : -1; // topLeftId
+	nb[5] = (nb[2] >= 0 && nb[1] >= 0) ? nodeId - mHeight + 1 : -1; // topRightId
+	nb[6] = (nb[3] >= 0 && nb[0] >= 0) ? nodeId + mHeight - 1 : -1; // bottomLeftId
+	nb[7] = (nb[3] >= 0 && nb[1] >= 0) ? nodeId + mHeight + 1 : -1; // bottomRightId
 
 	int numEdges = 0;
-	for (int i = 0; i < 4; ++i) {
+	for (int i = 0; i < nbCount; ++i) {
 		if (nb[i] < 0)
 			continue;
 
@@ -30,7 +35,12 @@ int GraphMap::getEdges(Edge edges[MAX_EDGES], int nodeId) const
 			continue;	// non walkable area
 
 		edges[numEdges].targetNodeId = nb[i];
-		edges[numEdges].cost = cost;
+
+		if (i < 4)
+			edges[numEdges].cost = cost * 2;
+		else
+			edges[numEdges].cost = cost * 3;
+
 		++numEdges;
 	}
 
