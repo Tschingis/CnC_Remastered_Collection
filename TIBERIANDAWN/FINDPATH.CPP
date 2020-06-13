@@ -53,6 +53,8 @@
 #include	"DebugMap.h"
 #include	"CCGraphMap.h"
 #include	"Dijkstra.h"
+#include	"PathBuilder.h"
+#include	"DebugText.h"
 
 /*
 **	When an edge search is started, it can be performed CLOCKwise or
@@ -555,15 +557,6 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 	if (!final_moves) return(NULL);
 //	IsFindPath = true;
 
-	CCGraphMap graph(this,threshhold);
-	DebugMap debug((const char*)"C:\\projects\\home\\c_c_remastered\\bin\\mapcapture.png",&graph);
-	Dijkstra costMap(&graph);
-
-	costMap.run(source);
-
-	debug.writeCosts(costMap.getNodeDist());
-	debug.writeToFile();
-
 	/*
 	** Set the draw path variable to draw the path of the selected unit
 	** if necessary.
@@ -608,6 +601,134 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 	*/
 //	memset(path.Overlap, 0, 512);
 	path.Overlap[source >> 5] |= (1 << ((source & 31) - 1));
+
+	// is any movement required
+	if (source == dest)
+		return (&path);
+
+	char debugBaseFileName[255] = "C:\\projects\\home\\c_c_remastered\\bin\\";
+	char debugPngFileName[255];
+	char debugTxtFileName[255];
+
+	const char* myName = Text_String(Full_Name());
+	strcat(debugBaseFileName, myName);
+	strcpy(debugPngFileName, debugBaseFileName);
+	strcpy(debugTxtFileName, debugBaseFileName);
+	strcat(debugPngFileName, ".png");
+	strcat(debugTxtFileName, ".txt");
+
+
+	CCGraphMap graph(this, threshhold);
+	DebugMap debug(debugPngFileName, &graph);
+	DebugText debugText(debugTxtFileName);
+
+	Dijkstra costMap(&graph);
+
+	costMap.run(source);
+
+	debug.writeCosts(costMap.getNodeDist());
+	debug.writeRGB(source, 255, 0, 0);
+
+	PathBuilder builder(costMap.getParentNodes());
+	const int maxPathLen = 4096;
+	int nodeList[MAX_MLIST_SIZE];
+	int nodeListLen = builder.build(nodeList, maxPathLen, dest);
+
+	debug.writePath(nodeList, nodeListLen);
+
+	debug.writeToFile();
+
+
+	/*
+	**	Account for trailing end of list command, so reduce the maximum
+	**	allowed legal commands to reflect this.
+	*/
+	maxlen--;
+
+	const char moveDirs[8][10] = {
+		"N",
+		"NE",
+		"E",
+		"SE",
+		"S",
+		"SW",
+		"W",
+		"NW"
+	};
+
+	debugText.writeDebug("start: ");
+	debugText.writeDebug(source);
+	debugText.writeDebug("end: ");
+	debugText.writeDebug(dest);
+
+	// we will create a list of relative movements from the
+	// nodeList
+	// the nodelist will include the start and end node, this needs to be considered
+	for (int i = 1; i < nodeListLen; ++i) {
+		if (path.Length >= maxlen)
+			break;
+
+		int fromNode = nodeList[i - 1];
+		int toNode = nodeList[i];
+		debugText.writeDebug("from:");
+		debugText.writeDebug(fromNode);
+		debugText.writeDebug(" to:");
+		debugText.writeDebug(toNode);
+
+		//{return (CELL)(cell + AdjacentCell[dir]);}
+		// converts to: toNode= fromNode + AdjacentCell[dir] -> AdjacentCell[dir]= toNode - fromNode
+		int move = toNode - fromNode;
+		debugText.writeDebug(" diff:");
+		debugText.writeDebug(move);
+
+		FacingType dir = FACING_NONE;
+		for (int k = 0; k < FACING_COUNT; ++k) {
+			if (move == AdjacentCell[k]) {
+				dir = (FacingType)k;
+				break;
+			}
+		}
+		debugText.writeDebug(" dir:");
+		debugText.writeDebug(dir);
+		debugText.writeNewLine();
+
+		/*
+			** Now we need to register the new direction, updating the cell structure
+			** and the cost.
+			*/
+		int cpos = path.Length++;
+		path.Command[cpos] = dir;			// save of the direction we moved
+		//path.Cost += 1;			// figure new cost for cell
+
+		//path.Overlap[pos] |= (1 << bit);	// mark the we have entered point
+		//Register_Cell(&path, toNode, dir, 1, threshhold);
+
+	}
+
+	path.Command[path.Length++] = END;
+	path.Cost = costMap.getNodeDist()[dest];
+
+	debugText.writeDebug("Stored path:\n");
+	for (int k = 0; k < path.Length; ++k) {
+		debugText.writeDebug(k);
+		debugText.writeDebug(":");
+
+		int dir = path.Command[k];
+		if (dir < 0) {
+			debugText.writeDebug("END");
+		}
+		else {
+			debugText.writeDebug(moveDirs[dir]);
+		}
+		debugText.writeNewLine();
+	}
+
+
+
+	//Optimize_Moves(&path, threshhold);
+
+	return (&path);
+
 
 	startcell 			= source;
 

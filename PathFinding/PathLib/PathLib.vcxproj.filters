@@ -45,6 +45,9 @@
     <ClInclude Include="DebugMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DebugText.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BFS.cpp">
@@ -69,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DebugMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

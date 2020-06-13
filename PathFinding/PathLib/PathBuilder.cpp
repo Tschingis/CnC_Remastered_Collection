@@ -19,7 +19,7 @@ int PathBuilder::build(int * pathList, int maxLen, int dstNodeId)
 		currNodeId = mParentNodes[currNodeId];
 	}
 
-	std::reverse(pathList, pathList + (pathLen - 1));
+	std::reverse(pathList, pathList + pathLen);
 
 	return pathLen;
 }
