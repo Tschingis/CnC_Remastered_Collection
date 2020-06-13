@@ -532,7 +532,6 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 {
 	CELL					source = Coord_Cell(Coord);		// Source expressed as cell
 	static PathType			path;										// Main path control.
-	CELL					next;										// Next cell to enter
 
 	/*
 	** If we have been provided an illegal place to store our final moves
