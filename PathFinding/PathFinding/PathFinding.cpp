@@ -25,7 +25,8 @@ int main()
 	//const int startNodeId = graph.getNodeId(30, 10);
 	//const int endNodeId = graph.getNodeId(4, 50);
 	const int startNodeId = graph.getNodeId(24, 53);
-	const int endNodeId = graph.getNodeId(49, 41);
+	//const int endNodeId = graph.getNodeId(49, 41);
+	const int endNodeId = graph.getNodeId(45, 0);
 
 	auto start_time = std::chrono::high_resolution_clock::now();
 

@@ -53,7 +53,7 @@ void DebugMap::writeCostsScaled(const int * costs)
 void DebugMap::writePath(const int * pathNodes, int numPathNodes)
 {
 	for (int i = 0; i < numPathNodes; ++i) {
-		mBuffer[IBLUE(pathNodes[i])] = 255;
+		writeRGB(pathNodes[i], 0, 0, 255);
 	}
 }
 
