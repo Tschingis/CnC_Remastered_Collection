@@ -158,6 +158,11 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stb_image_write.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PathLib\PathLib.vcxproj">
+      <Project>{b18290b1-498c-461f-8449-5a1475efeff4}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

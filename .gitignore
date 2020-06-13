@@ -10,3 +10,4 @@
 /.vs
 /TIBERIANDAWN/*.user
 /PathFinding/PathLib/PathLib.vcxproj.user
+/PathFinding/PathLib/Release
