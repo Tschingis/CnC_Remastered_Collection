@@ -692,20 +692,11 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 		debugText.writeDebug(dir);
 		debugText.writeNewLine();
 
-		/*
-			** Now we need to register the new direction, updating the cell structure
-			** and the cost.
-			*/
-		int cpos = path.Length++;
-		path.Command[cpos] = dir;			// save of the direction we moved
-		//path.Cost += 1;			// figure new cost for cell
-
-		//path.Overlap[pos] |= (1 << bit);	// mark the we have entered point
-		//Register_Cell(&path, toNode, dir, 1, threshhold);
-
+		path.Command[path.Length++] = dir;			// save of the direction we moved
 	}
 
 	path.Command[path.Length++] = END;
+	// use cost from costmap
 	path.Cost = costMap.getNodeDist()[dest];
 
 	debugText.writeDebug("Stored path:\n");
@@ -722,10 +713,6 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 		}
 		debugText.writeNewLine();
 	}
-
-
-
-	//Optimize_Moves(&path, threshhold);
 
 	return (&path);
 
