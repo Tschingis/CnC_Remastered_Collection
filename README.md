@@ -16,3 +16,13 @@ which could not be reproduced 100% (mainly because of understanding the old game
 - Select the mod **Path+**
 - Restart the game
 - Start any mission or skirmish
+
+## Version Changelog
+
+### 1.1
+- Fixed threat compution costs which lead to massive evasion of threat areas
+
+### 1.0
+- Initial version
+
+
