@@ -6,8 +6,8 @@ which could not be reproduced 100% (mainly because of understanding the old game
 
 ## Implementation State
 
-Tiberium Dawn - Modified
-Red Alert - Unmodified
+- Tiberium Dawn - Modified
+- Red Alert - Unmodified
 
 ## Installation
 
