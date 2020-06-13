@@ -18,16 +18,5 @@
     <ClCompile Include="PathFinding.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Image.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="stb_image.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="stb_image_write.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

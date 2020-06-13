@@ -2,7 +2,7 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 
-#include "GraphMap.h"
+#include "ImageGraphMap.h"
 #include "BFS.h"
 #include "Dijkstra.h"
 #include "PathBuilder.h"
@@ -18,8 +18,7 @@ int main()
 	int x, y, n;
 	unsigned char *data = stbi_load(mapFileName, &x, &y, &n, 1);
 
-
-	GraphMap graph(x, y, data);
+	ImageGraphMap graph(x, y, data);
 	Dijkstra costMap(&graph);
 
 	//const int startNodeId = graph.getNodeId(30, 10);

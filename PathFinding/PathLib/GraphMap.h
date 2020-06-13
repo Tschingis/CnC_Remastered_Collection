@@ -5,18 +5,19 @@
 
 class GraphMap
 {
-	const unsigned char* mData;
+protected:
 	int mWidth;
 	int mHeight;
 
 public:
-	GraphMap(int width, int height, const unsigned char* data);
+	GraphMap(int width, int height);
+	virtual ~GraphMap();
 
 	inline int getNumNodes() const { return mWidth * mHeight; }
 	inline int getNodeId(int x, int y) const { return y * mWidth + x; }
 
 	// gets edges for a certain nodeId, returns the number of edges for the supplied node
-	int getEdges(Edge edges[MAX_EDGES], int nodeId) const;
+	virtual int getEdges(Edge edges[MAX_EDGES], int nodeId) const = 0;
 
 };
 
