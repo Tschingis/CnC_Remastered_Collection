@@ -151,21 +151,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BFS.cpp" />
-    <ClCompile Include="Dijkstra.cpp" />
-    <ClCompile Include="GraphMap.cpp" />
     <ClCompile Include="Image.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="PathBuilder.cpp" />
     <ClCompile Include="PathFinding.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BFS.h" />
-    <ClInclude Include="Dijkstra.h" />
-    <ClInclude Include="Edge.h" />
-    <ClInclude Include="GraphMap.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="PathBuilder.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stb_image_write.h" />
   </ItemGroup>

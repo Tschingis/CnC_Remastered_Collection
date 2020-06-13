@@ -151,10 +151,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BFS.h" />
+    <ClInclude Include="Dijkstra.h" />
+    <ClInclude Include="Edge.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GraphMap.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="PathBuilder.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BFS.cpp" />
+    <ClCompile Include="Dijkstra.cpp" />
+    <ClCompile Include="GraphMap.cpp" />
+    <ClCompile Include="Map.cpp" />
+    <ClCompile Include="PathBuilder.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
