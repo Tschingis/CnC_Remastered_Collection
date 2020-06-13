@@ -1,10 +1,28 @@
 #include "ImageGraphMap.h"
+#include "stb_image.h"
 
-ImageGraphMap::ImageGraphMap(int width, int height, const unsigned char * data)
+ImageGraphMap::ImageGraphMap(int width, int height, unsigned char * data)
 	: GraphMap(width,height)
 	, mData(data)
+	, mSelfLoaded(false)
 {
 }
+
+ImageGraphMap::ImageGraphMap(const char* pngFileName)
+	: GraphMap(0,0)
+	, mSelfLoaded(true)
+{
+	int n;
+	// force grey scale image with parameter 1
+	mData = stbi_load(pngFileName, &mWidth, &mHeight, &n, 1);
+}
+
+ImageGraphMap::~ImageGraphMap()
+{
+	if (mSelfLoaded)
+		stbi_image_free(mData);
+}
+
 
 int ImageGraphMap::getEdges(Edge edges[MAX_EDGES], int nodeId) const
 {

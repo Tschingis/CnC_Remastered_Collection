@@ -13,6 +13,8 @@ public:
 	GraphMap(int width, int height);
 	virtual ~GraphMap();
 
+	inline int getWidth() const { return mWidth; }
+	inline int getHeight() const { return mHeight; }
 	inline int getNumNodes() const { return mWidth * mHeight; }
 	inline int getNodeId(int x, int y) const { return y * mWidth + x; }
 

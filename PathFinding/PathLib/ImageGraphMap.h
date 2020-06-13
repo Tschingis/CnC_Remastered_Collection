@@ -3,10 +3,13 @@
 
 class ImageGraphMap : public GraphMap
 {
-	const unsigned char* mData;
+	unsigned char* mData;
+	bool mSelfLoaded;
 
 public:
-	ImageGraphMap(int width, int height, const unsigned char* data);
+	ImageGraphMap(int width, int height, unsigned char* data);
+	ImageGraphMap(const char* pngFileName);
+	~ImageGraphMap();
 
 	virtual int getEdges(Edge edges[MAX_EDGES], int nodeId) const;
 };
