@@ -8,6 +8,7 @@ class CCGraphMap : public GraphMap
 {
 	FootClass*	mMoveable;
 	MoveType	mThreshhold;
+	int			mRisk;
 public:
 	CCGraphMap(FootClass* moveable, MoveType threshhold);
 

@@ -531,52 +531,16 @@ bool FootClass::Register_Cell(PathType *path, CELL cell, FacingType dir, int cos
 PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, MoveType threshhold)
 {
 	CELL					source = Coord_Cell(Coord);		// Source expressed as cell
-	static PathType	path;										// Main path control.
+	static PathType			path;										// Main path control.
 	CELL					next;										// Next cell to enter
-	CELL					startcell;								// Cell we started in
-	FacingType			direction;								// Working direction of look ahead.
-	FacingType			newdir;									// Tentative facing value.
-
-	bool					left=false, 							// Was leftward path legal?
-							right=false;							// Was rightward path legal?
-
-	int					len;										// Length of detour command list.
-	int					unit_threat;							// Calculated unit threat rating
-	int					cost;										// Cost to enter the square
-	FacingType			moves_left[MAX_MLIST_SIZE+2], 	// Counterclockwise move list.
-							moves_right[MAX_MLIST_SIZE+2];	// Clockwise move list.
-	PathType				pleft,pright;							// Path control structures.
-	PathType				*which;									// Which path to actually use.
-	int					threat = 0;			//
-	int					threat_stage = 0; //These weren't initialized. ST - 1/8/2019 12:03PM
 
 	/*
 	** If we have been provided an illegal place to store our final moves
 	** then forget it.
 	*/
 	if (!final_moves) return(NULL);
-//	IsFindPath = true;
 
-	/*
-	** Set the draw path variable to draw the path of the selected unit
-	** if necessary.
-	*/
-	if (!Debug_Find_Path) {
-		DrawPath = Is_Selected_By_Player() && Special.IsShowPath;
-	} else {
-		DrawPath = Is_Selected_By_Player();
-	}
-	Debug_Draw_Map("Initial Draw", source, dest, false);
-
-//	MoveMask = flags;
-	if (Team && Team->Class->IsRoundAbout) {
-		unit_threat			= (Team) ? Team->Risk : Risk();
-		threat_stage		= 0;
-		threat				= 0;
-	} else {
-		unit_threat = threat = -1;
-	}
-
+	// nice hacking for other methods ...
 	StartLocation = source;
 	DestLocation = dest;
 
@@ -593,73 +557,29 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 	path.LastOverlap	= -1;
 	path.LastFixup		= -1;
 
+	// overlap is no longer needed, still initialize it
 	memset(path.Overlap, 0, sizeof(MainOverlap));
-
-	/*
-	** Clear the over lap list and then make sure that our starting position is marked
-	** on the overlap list.  (Otherwise the harvesters will drive in circles... )
-	*/
-//	memset(path.Overlap, 0, 512);
-	path.Overlap[source >> 5] |= (1 << ((source & 31) - 1));
 
 	// is any movement required
 	if (source == dest)
 		return (&path);
 
-	char debugBaseFileName[255] = "C:\\projects\\home\\c_c_remastered\\bin\\";
-	char debugPngFileName[255];
-	char debugTxtFileName[255];
-
-	const char* myName = Text_String(Full_Name());
-	strcat(debugBaseFileName, myName);
-	strcpy(debugPngFileName, debugBaseFileName);
-	strcpy(debugTxtFileName, debugBaseFileName);
-	strcat(debugPngFileName, ".png");
-	strcat(debugTxtFileName, ".txt");
-
-
+	// new pathfinding
 	CCGraphMap graph(this, threshhold);
-	DebugMap debug(debugPngFileName, &graph);
-	DebugText debugText(debugTxtFileName);
-
 	Dijkstra costMap(&graph);
 
 	costMap.run(source);
-
-	debug.writeCosts(costMap.getNodeDist());
-	debug.writeRGB(source, 255, 0, 0);
 
 	PathBuilder builder(costMap.getParentNodes());
 	const int maxPathLen = 4096;
 	int nodeList[MAX_MLIST_SIZE];
 	int nodeListLen = builder.build(nodeList, maxPathLen, dest);
 
-	debug.writePath(nodeList, nodeListLen);
-
-	debug.writeToFile();
-
-
 	/*
 	**	Account for trailing end of list command, so reduce the maximum
 	**	allowed legal commands to reflect this.
 	*/
 	maxlen--;
-
-	const char moveDirs[8][10] = {
-		"N",
-		"NE",
-		"E",
-		"SE",
-		"S",
-		"SW",
-		"W",
-		"NW"
-	};
-
-	debugText.writeDebug("start: ");
-	debugText.writeDebug(source);
-	debugText.writeDebug("end: ");
-	debugText.writeDebug(dest);
 
 	// we will create a list of relative movements from the
 	// nodeList
@@ -670,17 +590,10 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 
 		int fromNode = nodeList[i - 1];
 		int toNode = nodeList[i];
-		debugText.writeDebug("from:");
-		debugText.writeDebug(fromNode);
-		debugText.writeDebug(" to:");
-		debugText.writeDebug(toNode);
 
 		//{return (CELL)(cell + AdjacentCell[dir]);}
 		// converts to: toNode= fromNode + AdjacentCell[dir] -> AdjacentCell[dir]= toNode - fromNode
 		int move = toNode - fromNode;
-		debugText.writeDebug(" diff:");
-		debugText.writeDebug(move);
-
 		FacingType dir = FACING_NONE;
 		for (int k = 0; k < FACING_COUNT; ++k) {
 			if (move == AdjacentCell[k]) {
@@ -688,9 +601,6 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 				break;
 			}
 		}
-		debugText.writeDebug(" dir:");
-		debugText.writeDebug(dir);
-		debugText.writeNewLine();
 
 		path.Command[path.Length++] = dir;			// save of the direction we moved
 	}
@@ -699,317 +609,27 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 	// use cost from costmap
 	path.Cost = costMap.getNodeDist()[dest];
 
-	debugText.writeDebug("Stored path:\n");
-	for (int k = 0; k < path.Length; ++k) {
-		debugText.writeDebug(k);
-		debugText.writeDebug(":");
+#ifdef DEBUG_PATH
+	char debugBaseFileName[255] = "C:\\projects\\home\\c_c_remastered\\bin\\";
+	char debugPngFileName[255];
 
-		int dir = path.Command[k];
-		if (dir < 0) {
-			debugText.writeDebug("END");
-		}
-		else {
-			debugText.writeDebug(moveDirs[dir]);
-		}
-		debugText.writeNewLine();
-	}
+	const char* myName = Text_String(Full_Name());
+	strcat(debugBaseFileName, myName);
+	char pointStr[10];
+	sprintf(pointStr, "%d", (int)this);
+	strcat(debugBaseFileName, pointStr);
+	strcpy(debugPngFileName, debugBaseFileName);
+	strcat(debugPngFileName, ".png");
+
+	DebugMap debug(debugPngFileName, &graph);
+
+	debug.writeCosts(costMap.getNodeDist());
+	debug.writeRGB(source, 255, 0, 0);
+	debug.writePath(nodeList, nodeListLen);
+	debug.writeToFile();
+#endif
 
 	return (&path);
-
-
-	startcell 			= source;
-
-	/*
-	**	Account for trailing end of list command, so reduce the maximum
-	**	allowed legal commands to reflect this.
-	*/
-	maxlen--;
-
-	/*
-	**	As long as there is room to put commands in the movement command list,
-	** then put commands in it.  We build the path using the following
-	** methodology.
-	**
-	** 1. Scan through the desired strait line path until we eiter hit an
-	**    impassable or have created a valid path.
-	**
-	** 2. If we have hit an impassable, walk through the impassable to make
-	**    sure that there is a passable on the other side.  If there is not
-	**    and we can not change the impassable, then this list is dead.
-	**
-	** 3. Walk around the impassable on both the left and right edges and
-	**    take the shorter of the two paths.
-	**
-	** 4. Taking the new location as our start location start again with
-	**    step #1.
-	*/
-	while (path.Length < maxlen) {
-
-top_of_list:
-		/*
-		**	Have we reached the destination already?  If so abort any further
-		**	command building.
-		*/
-		if (startcell == dest) {
-			break;
-		}
-
-		/*
-		**	Find the absolute correct direction to reach the next straight
-		** line cell and what cell it is.
-		*/
-		direction	= CELL_FACING(startcell, dest);
-		next			= Adjacent_Cell(startcell, direction);
-
-		/*
-		**	If we can move here, then make this our next move.
-		*/
-		cost = Passable_Cell(next, direction, threat, threshhold);
-		if (cost) {
-			Draw_Cell_Point(next, true, threat_stage);
-			Register_Cell(&path, next, direction, cost, threshhold);
-		} else {
-			if (Debug_Find_Path && DrawPath) {
-				Debug_Draw_Map("Walk Through Obstacle", startcell, dest, true);
-			}
-			Draw_Cell_Point(next, false, threat_stage);
-
-			/*
-			**	If the impassable location is actually the destination,
-			**	then stop here and consider this "good enough".
-			*/
-			if (next == dest) break;
-
-			/*
-			**	We could not move to the next cell, so follow through the
-			**	impassable until we find a passable spot that can be reached.
-			** Once we find a passable, figure out the shortest path to it.
-			** Since we have variable passable conditions this is not as
-			** simple as it used to be.  The limiter loop below allows us to
-			** step through ten donuts before we give up.
-			*/
-			for (int limiter = 0; limiter < 5; limiter++) {
-
-				/*
-				**	Get the next passable position by zipping through the
-				** impassable positions until a passable position is found
-				**	or the destination is reached.
-				*/
-				for (;;) {
-
-					/*
-					**	Move one step closer toward destination.
-					*/
-					newdir	= CELL_FACING(next, dest);
-					next		= Adjacent_Cell(next, newdir);
-
-					/*
-					** If the cell is passable then we have been completely
-					** sucessful.  If the cell is not passable then continue.
-					*/
-					if ((Passable_Cell(next, FACING_NONE, threat, threshhold)) || (next == dest)) {
-						Draw_Cell_Point(next, true, threat_stage);
-						break;
-					} else {
-						Draw_Cell_Point(next, false, threat_stage);
-					}
-
-					/*
-					**	If we reached destination while in this loop, we
-					**	know that either the destination is impassible (if
-					**	we are ignoring) or that we need to up our threat
-					** tolerance and try again.
-					*/
-					if (next == dest) {
-						if (threat != -1) {
-							switch (threat_stage++) {
-								case 0:
-									threat = unit_threat >> 1;
-									break;
-
-								case 1:
-									threat += unit_threat;
-									break;
-
-								case 2:
-									threat = -1;
-									break;
-							}
-							goto top_of_list;
-						}
-						goto end_of_list;
-					}
-				}
-
-				/*
-				**	Try to find a path to the passable position by following
-				**	the edge of the blocking object in both CLOCKwise and
-				**	COUNTERCLOCKwise fashions.
-				*/
-				int follow_len = maxlen + (maxlen >> 1);
-
-				Debug_Draw_Map("Follow left edge", startcell,next,true);
-				Mem_Copy(&path, &pleft, sizeof(PathType));
-				pleft.Command 	= &moves_left[0];
-				pleft.Overlap 	= LeftOverlap;
-				Mem_Copy(path.Command, pleft.Command, path.Length);
-				Mem_Copy(path.Overlap, pleft.Overlap, sizeof(LeftOverlap));
-				left = Follow_Edge(startcell, next, &pleft, COUNTERCLOCK, direction, threat, threat_stage, sizeof(moves_left), threshhold);
-//				left = Follow_Edge(startcell, next, &pleft, COUNTERCLOCK, direction, threat, threat_stage, follow_len, threshhold);
-
-				if (left) {
-					follow_len = MIN(maxlen, pleft.Length + (pleft.Length >> 1));
-				}
-
-				/*
-				** If we are in debug mode then let us know how well our left path
-				** did.
-				*/
-				if (Debug_Find_Path && DrawPath) {
-					Fancy_Text_Print("   Left", 0, 92, WHITE, BLACK, TPF_6POINT);
-					Fancy_Text_Print("Total Steps", 0, 100, WHITE, BLACK, TPF_6POINT);
-					if (left) {
-						Fancy_Text_Print("    %d", 0, 108, WHITE, BLACK, TPF_6POINT, pleft.Length);
-					} else {
-						Fancy_Text_Print("   FAIL", 0, 108, WHITE, BLACK, TPF_6POINT);
-					}
-				}
-
-				Debug_Draw_Map("Follow right edge", startcell, next, true);
-				Mem_Copy(&path, &pright, sizeof(PathType));
-				pright.Command = &moves_right[0];
-				pright.Overlap = RightOverlap;
-				Mem_Copy(path.Command, pright.Command, path.Length);
-				Mem_Copy(path.Overlap, pright.Overlap, sizeof(RightOverlap));
-				right = Follow_Edge(startcell, next, &pright, CLOCK, direction, threat, threat_stage, sizeof(moves_right), threshhold);
-//				right = Follow_Edge(startcell, next, &pright, CLOCK, direction, threat, threat_stage, follow_len, threshhold);
-
-				/*
-				** If we are in debug mode then let us know how well our right path
-				** did.
-				*/
-				if (Debug_Find_Path && DrawPath) {
-					Fancy_Text_Print("  Right", 0, 92, WHITE, BLACK, TPF_6POINT);
-					Fancy_Text_Print("Total Steps", 0, 100, WHITE, BLACK, TPF_6POINT);
-					if (right) {
-						Fancy_Text_Print("    %d", 0, 108, WHITE, BLACK, TPF_6POINT, pright.Length);
-					} else {
-						Fancy_Text_Print("   FAIL", 0, 108, WHITE, BLACK, TPF_6POINT);
-					}
-				}
-
-				/*
-				**	If we could find a path, break from this loop. Otherwise this
-				**	means that we have found a "hole" of passable terrain that
-				**	cannot be reached by normal means. Scan forward looking for
-				**	the other side of the "doughnut".
-				*/
-				if (left || right) break;
-
-				/*
-				**	If no path can be found to the intermediate cell, then
-				**	presume we have found a doughnut of some sort. Scan
-				**	forward until the next impassable is found and then
-				**	process this loop again.
-				*/
-				do {
-
-					/*
-					**	If we reached destination while in this loop, we
-					**	know that either the destination is impassible (if
-					**	we are ignoring) or that we need to up our threat
-					** tolerance and try again.
-					*/
-					if (next == dest) {
-						if (threat != -1) {
-							switch (threat_stage++) {
-								case 0:
-									threat = unit_threat >> 1;
-									break;
-
-								case 1:
-									threat += unit_threat;
-									break;
-
-								case 2:
-									threat = -1;
-									break;
-							}
-							goto top_of_list;
-						}
-						goto end_of_list;
-					}
-
-					newdir	= CELL_FACING(next, dest);
-					next		= Adjacent_Cell(next, newdir);
-				} while (Passable_Cell(next, newdir, threat, threshhold));
-			}
-
-			if (!left && !right) break;
-
-			/*
-			**	We found a path around the impassable locations, so figure out
-			**	which one was the smallest and copy those moves into the
-			**	path.Command array.
-			*/
-			which = &pleft;
-			if (right) {
-				which = &pright;
-				if (left) {
-					if (pleft.Length < pright.Length) {
-						which = &pleft;
-					} else {
-						which = &pright;
-					}
-				}
-			}
-
-			/*
-			**	Record as much as possible of the shorter of the two
-			**	paths. The trailing EOL command is not copied because
-			**	this may not be the end of the find path logic.
-			*/
-			len = which->Length;
-			len = MIN(len, maxlen);
-			if (len > 0) {
-				memcpy(&path.Overlap[0], &which->Overlap[0], sizeof(LeftOverlap));
-				memcpy(&path.Command[0], &which->Command[0], len);
-				path.Length 		= len;
-				path.Cost   		= which->Cost;
-				path.LastOverlap 	= -1;
-				path.LastFixup	 	= -1;
-			} else {
-				break;
-			}
-			Debug_Draw_Map("Walking to next obstacle", next, dest, true);
-		}
-		startcell = next;
-	}
-
-end_of_list:
-	/*
-	**	Poke in the stop command.
-	*/
-	if (path.Length < maxlen) {
-		path.Command[path.Length++] = END;
-	}
-	if (Debug_Find_Path && DrawPath) {
-		Map.Flag_To_Redraw(true);
-	}
-	/*
-	**	Optimize the move list but only necessary if
-	**	diagonal moves are allowed.
-	*/
-	#ifdef DIAGONAL
-		Optimize_Moves(&path, threshhold);
-	#endif
-	if (Debug_Find_Path && DrawPath) {
-		Debug_Draw_Map("Final Generated Path", startcell,dest,false);
-		Debug_Draw_Path(&path);
-		Get_Key_Num();
-	}
-//	IsFindPath = false;
-	return(&path);
 }
 
 

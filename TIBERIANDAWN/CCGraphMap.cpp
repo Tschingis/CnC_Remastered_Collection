@@ -1,44 +1,44 @@
 #include "CCGraphMap.h"
-//#include "DEFINES.H"
-//#include "FUNCTION.H"
 #include "FOOT.H"
+
+#define COSTSCALE_STRAIGHT		2
+#define COSTSCALE_DIAGONAL		3
+#define COSTSCALE_THREAT		1
+
 
 CCGraphMap::CCGraphMap(FootClass* moveable, MoveType threshhold)
 	: GraphMap(MAP_CELL_W, MAP_CELL_H)
 	, mMoveable(moveable)
 	, mThreshhold(threshhold)
 {
-
+	mRisk = (mMoveable->Team) ? mMoveable->Team->Risk : mMoveable->Risk();
 }
-
-//typedef enum FacingType : char {
-//	FACING_NONE = -1,
-//	FACING_N,			// North
-//	FACING_NE,			// North-East
-//	FACING_E,			// East
-//	FACING_SE,			// South-East
-//	FACING_S,			// South
-//	FACING_SW,			// South-West
-//	FACING_W,			// West
-//	FACING_NW,			// North-West
-//
-//	FACING_COUNT,			// Total of 8 directions (0..7).
-//	FACING_FIRST = 0
-//} FacingType;
 
 int CCGraphMap::getEdges(Edge edges[MAX_EDGES], int nodeId) const
 {
 	int numEdges = 0;
-	int threat = 0;
 
 	// straight movements, which can be issued with no problems
 	for (int i = 0; i < FACING_COUNT; ++i) {
 		FacingType dir = (FacingType)i;
 		CELL next = Adjacent_Cell((CELL)nodeId, dir);
 
-		auto cost = mMoveable->Passable_Cell(next, dir, threat, mThreshhold);
+		// we set threat to -1 and build thread value into cost value
+		auto cost = mMoveable->Passable_Cell(next, dir, -1, mThreshhold);
 		if (cost) {
-			edges[numEdges].cost = i % 2 ? cost * 3 : cost * 2; // if even -> straight movement, uneven -> diagonal movement
+			if (GameToPlay == GAME_NORMAL) {
+				int cellThreat = Map.Cell_Threat(next, mMoveable->Owner());
+				if (cellThreat > 0) {
+					cellThreat *= COSTSCALE_THREAT;
+					cellThreat -= mRisk;
+				}
+
+				// only add positiv costs, otherwise dijstrak will freak out
+				if (cellThreat > 0)
+					cost += cellThreat;
+			}
+
+			edges[numEdges].cost = i % 2 ? cost * COSTSCALE_DIAGONAL : cost * COSTSCALE_STRAIGHT; // if even -> straight movement, uneven -> diagonal movement
 			edges[numEdges].targetNodeId = next;
 			++numEdges;
 		}
