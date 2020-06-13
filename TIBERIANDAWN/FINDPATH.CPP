@@ -574,6 +574,10 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 	int nodeList[MAX_MLIST_SIZE];
 	int nodeListLen = builder.build(nodeList, maxPathLen, dest);
 
+	// target not reachable
+	if (nodeListLen == 0)
+		return &path;
+
 	/*
 	**	Account for trailing end of list command, so reduce the maximum
 	**	allowed legal commands to reflect this.
