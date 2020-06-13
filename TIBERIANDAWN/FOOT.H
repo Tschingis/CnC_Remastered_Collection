@@ -43,7 +43,7 @@
 class UnitClass;
 class BuildingClass;
 
-
+class CCGraphMap;
 /****************************************************************************
 **	Movable objects are handled by this class definition. Moveable objects
 **	cover everything except buildings.
@@ -278,6 +278,8 @@ class FootClass :	public TechnoClass
 		int Rescue_Mission(TARGET tarcom);
 
 	private:
+		friend class CCGraphMap;
+
 		int Passable_Cell(CELL cell, FacingType face, int threat, MoveType threshhold);
 		PathType * Find_Path(CELL dest, FacingType *final_moves, int maxlen, MoveType threshhold);
 		void Debug_Draw_Map(char *txt, CELL start, CELL dest, bool pause);

@@ -97,7 +97,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>TRUE_FALSE_DEFINED;WIN32;NDEBUG;_WINDOWS;_USRDLL;TIBERIANDAWN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./win32lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./win32lib;../PathFinding/PathLib</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4800;4244;4996</DisableSpecificWarnings>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -184,6 +184,7 @@
     <ClInclude Include="CARGO.H" />
     <ClInclude Include="CCDDE.H" />
     <ClInclude Include="CCFILE.H" />
+    <ClInclude Include="CCGraphMap.h" />
     <ClInclude Include="CDFILE.H" />
     <ClInclude Include="CELL.H" />
     <ClInclude Include="CHECKBOX.H" />
@@ -377,6 +378,7 @@
     <ClCompile Include="CARGO.CPP" />
     <ClCompile Include="CCDDE.CPP" />
     <ClCompile Include="CCFILE.CPP" />
+    <ClCompile Include="CCGraphMap.cpp" />
     <ClCompile Include="CDATA.CPP" />
     <ClCompile Include="CDFILE.CPP" />
     <ClCompile Include="CELL.CPP" />
@@ -558,6 +560,11 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource\TiberianDawn.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PathFinding\PathLib\PathLib.vcxproj">
+      <Project>{b18290b1-498c-461f-8449-5a1475efeff4}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -50,6 +50,9 @@
 
 #include	"function.h"
 //#include	<string.h>
+#include	"DebugMap.h"
+#include	"CCGraphMap.h"
+#include	"Dijkstra.h"
 
 /*
 **	When an edge search is started, it can be performed CLOCKwise or
@@ -551,6 +554,15 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 	*/
 	if (!final_moves) return(NULL);
 //	IsFindPath = true;
+
+	CCGraphMap graph(this,threshhold);
+	DebugMap debug((const char*)"C:\\projects\\home\\c_c_remastered\\bin\\mapcapture.png",&graph);
+	Dijkstra costMap(&graph);
+
+	costMap.run(source);
+
+	debug.writeCosts(costMap.getNodeDist());
+	debug.writeToFile();
 
 	/*
 	** Set the draw path variable to draw the path of the selected unit
