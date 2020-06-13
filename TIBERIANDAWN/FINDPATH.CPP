@@ -69,6 +69,11 @@
 #define	DIAGONAL
 
 /*
+** If defined, path planning will print out PNG images to defined location
+*/
+//#define DEBUG_PATH	"C:\\projects\\home\\c_c_remastered\\bin\\debug"
+
+/*
 **	This is the marker to signify the end of the path list.
 */
 #define	END			FACING_NONE
@@ -613,7 +618,7 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 	path.Cost = costMap.getNodeDist()[dest];
 
 #ifdef DEBUG_PATH
-	char debugBaseFileName[255] = "C:\\projects\\home\\c_c_remastered\\bin\\";
+	char debugBaseFileName[255] = DEBUG_PATH;
 	char debugPngFileName[255];
 
 	const char* myName = Text_String(Full_Name());

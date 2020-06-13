@@ -26,19 +26,20 @@ int CCGraphMap::getEdges(Edge edges[MAX_EDGES], int nodeId) const
 		// we set threat to -1 and build thread value into cost value
 		auto cost = mMoveable->Passable_Cell(next, dir, -1, mThreshhold);
 		if (cost) {
+			// scale costs for different movement types
+			cost= i % 2 ? cost * COSTSCALE_DIAGONAL : cost * COSTSCALE_STRAIGHT; // if even -> straight movement, uneven -> diagonal movement
+
 			if (GameToPlay == GAME_NORMAL) {
 				int cellThreat = Map.Cell_Threat(next, mMoveable->Owner());
-				if (cellThreat > 0) {
-					cellThreat *= COSTSCALE_THREAT;
-					cellThreat -= mRisk;
-				}
+				cellThreat *= COSTSCALE_THREAT;
+				cellThreat -= mRisk;
 
 				// only add positiv costs, otherwise dijstrak will freak out
 				if (cellThreat > 0)
 					cost += cellThreat;
 			}
 
-			edges[numEdges].cost = i % 2 ? cost * COSTSCALE_DIAGONAL : cost * COSTSCALE_STRAIGHT; // if even -> straight movement, uneven -> diagonal movement
+			edges[numEdges].cost = cost;
 			edges[numEdges].targetNodeId = next;
 			++numEdges;
 		}
