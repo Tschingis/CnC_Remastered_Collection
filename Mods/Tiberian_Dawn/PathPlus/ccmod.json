@@ -1,1 +1,1 @@
-{ "name": "Path+", "description": "A better path planing using dijkstra alogrithm. Everything else untouched.", "author": "Markus Wilhelm", "load_order": 1, "version_low": 0, "version_high": 1, "game_type": "TD" }
+{ "name": "Path+", "description": "A better path planing using dijkstra alogrithm. Everything else untouched.", "author": "Markus Wilhelm", "load_order": 1, "version_low": 1, "version_high": 1, "game_type": "TD" }
