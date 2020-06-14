@@ -74,7 +74,6 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
-#include	"DebugText.h"
 
 /***********************************************************************************************
  * FootClass::FootClass -- Default constructor for foot class objects.                         *
@@ -350,13 +349,8 @@ bool FootClass::Basic_Path(void)
 
 	Path[0] = FACING_NONE;
 
-	DebugText debug("C:\\temp\\log.txt");
-	debug.setPrefix("obj(%d/%s)|basic_path|", (int)this, Text_String(Full_Name()));
-
 	if (Target_Legal(NavCom)) {
 		cell = As_Cell(NavCom);
-
-		debug.writeFormat("legal target tcell: %d", cell);
 
 		/*
 		**	When the navigation computer is set to a location that is impassible, then
@@ -441,10 +435,8 @@ bool FootClass::Basic_Path(void)
 			**	aggressive case. If this fails, then no path will succeed. Further
 			**	scanning is unnecessary.
 			*/
-			debug.writeFormat("findpath1, maxtype: %d", maxtype);
 			path = Find_Path(cell, &workpath1[0], sizeof(workpath1), maxtype);
 			if (path && path->Cost) {
-				debug.writeFormat("findpath1_succ maxtype:%d,cost:%d,len:%d,move0:%d,move1:%d", maxtype, path->Cost, path->Length, path->Command[0], path->Command[1]);
 				memcpy(&path1, path, sizeof(path1));
 				found1 = true;
 
@@ -453,10 +445,8 @@ bool FootClass::Basic_Path(void)
 				**	comparison with the most agressive path. If they are very close, then
 				**	go with the best (easiest) path method.
 				*/
-				debug.writeFormat("findpath2, maxtype: %d", MOVE_CLOAK);
 				path = Find_Path(cell, &workpath2[0], sizeof(workpath2), MOVE_CLOAK);
 				if (path && path->Cost && path->Cost < MAX((path1.Cost + (path1.Cost/2)), 3)) {
-					debug.writeFormat("findpath2_succ maxtype:%d,cost:%d,len:%d,move0:%d,move1:%d", MOVE_CLOAK, path->Cost, path->Length, path->Command[0], path->Command[1]);
 					memcpy(&path1, path, sizeof(path1));
 					memcpy(workpath1, workpath2, sizeof(workpath1));
 				} else {
@@ -466,10 +456,8 @@ bool FootClass::Basic_Path(void)
 					**	the rest of the path options, looking for the best one.
 					*/
 					for (MoveType move = MOVE_MOVING_BLOCK; move < maxtype; move++) {
-						debug.writeFormat("findpathn, maxtype: %d", move);
 						path = Find_Path(cell, &workpath2[0], sizeof(workpath2), move);
 						if (path && path->Cost && path->Cost < MAX((path1.Cost + (path1.Cost/2)), 3)) {
-							debug.writeFormat("findpathn_succ maxtype:%d,cost:%d,len:%d,move0:%d,move1:%d", move, path->Cost, path->Length, path->Command[0], path->Command[1]);
 							memcpy(&path1, path, sizeof(path1));
 							memcpy(workpath1, workpath2, sizeof(workpath1));
 						}
@@ -504,11 +492,8 @@ bool FootClass::Basic_Path(void)
 			**	list.
 			*/
 			if (found1) {
-				debug.writeFormat("pre_fixup cost:%d,len:%d,move0:%d,move1:%d", path1.Cost, path1.Length, path1.Command[0], path1.Command[1]);
 				Fixup_Path(&path1);
-				debug.writeFormat("post_fixup cost:%d,len:%d,move0:%d,move1:%d", path1.Cost, path1.Length, path1.Command[0], path1.Command[1]);
 				memcpy(&Path[0], &workpath1[0], MIN(path1.Length, (int)sizeof(Path)));
-				debug.writeFormat("path move0:%d,move1:%d", Path[0], Path[1]);
 			}
 
 			Mark(MARK_DOWN);
@@ -531,10 +516,8 @@ bool FootClass::Basic_Path(void)
 
 		PathDelay = PATH_DELAY;
 		if (Path[0] != FACING_NONE) {
-			debug.writeFormat("got valid path, finished");
 			return(true);
 		}
-		debug.writeFormat("!bail out, stop driver!, path0:%d",Path[0]);
 		/*
 		**	If a basic path couldn't be determined, then abort the navigation process.
 		*/
