@@ -1,6 +1,9 @@
 #pragma once
 #include "GraphMap.h"
 
+// if defined, the algorithm exists directly if path found
+#define DIJKSTRA_EARLY_DROPOUT
+
 class Dijkstra
 {
 	const GraphMap* mGraph;
@@ -18,6 +21,6 @@ public:
 
 	inline const int* getNodeDist() const { return mNodeDist; }
 	inline const int* getParentNodes() const { return mParentNodes; }
-	void run(int startNode);
+	void run(int startNodeId, int endNodeId);
 };
 

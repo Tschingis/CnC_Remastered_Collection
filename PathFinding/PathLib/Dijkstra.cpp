@@ -22,7 +22,7 @@ Dijkstra::~Dijkstra()
 	delete[] mParentNodes;
 }
 
-void Dijkstra::run(int startNodeId)
+void Dijkstra::run(int startNodeId, int endNodeId)
 {
 	// set dist to infinity
 	memset(mNodeDist, Infinity, sizeof(int)*mNumNodes);
@@ -42,6 +42,9 @@ void Dijkstra::run(int startNodeId)
 		auto currNodeId = currNode.second;
 		auto currCosts = currNode.first;
 		queue.pop();
+
+		if (currNodeId == endNodeId)
+			return;
 
 		// if we found already a cheaper path until this node, we skip this entry
 		if (mNodeDist[currNodeId] < currCosts)

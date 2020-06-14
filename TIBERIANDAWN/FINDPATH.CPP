@@ -572,7 +572,7 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 	CCGraphMap graph(this, threshhold);
 	Dijkstra costMap(&graph);
 
-	costMap.run(source);
+	costMap.run(source,dest);
 
 	PathBuilder builder(costMap.getParentNodes());
 	const int maxPathLen = 4096;
@@ -611,11 +611,11 @@ PathType * FootClass::Find_Path(CELL dest, FacingType *final_moves, int maxlen, 
 		}
 
 		path.Command[path.Length++] = dir;			// save of the direction we moved
+		// use cost from costmap
+		path.Cost = costMap.getNodeDist()[toNode];
 	}
 
 	path.Command[path.Length++] = END;
-	// use cost from costmap
-	path.Cost = costMap.getNodeDist()[dest];
 
 #ifdef DEBUG_PATH
 	char debugBaseFileName[255] = DEBUG_PATH;
