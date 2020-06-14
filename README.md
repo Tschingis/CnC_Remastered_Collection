@@ -19,6 +19,9 @@ which could not be reproduced 100% (mainly because of understanding the old game
 
 ## Version Changelog
 
+### 1.2
+- Fixed path computation in FootClass which lead to stuck units
+
 ### 1.1
 - Fixed threat compution costs which lead to extreme avoidance of threat areas
 
